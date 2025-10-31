@@ -12,7 +12,9 @@ export class UserService {
 
       data.password = await HashPassword(data.password);
 
-      const user = await UsersModel.create(data);
+      let user = await UsersModel.create(data);
+       user = user.toObject();
+      delete user.password;
       return user;
     } catch (error) {
       throw error;
@@ -22,13 +24,13 @@ export class UserService {
   static async getByEmail(email) {
     const user = UsersModel.findOne({
       email
-    });
+    }).select("-password");
     return user;
   }
 
   static async getUserById(id) {
     try {
-      const user = await UsersModel.findById(id);
+      const user = await UsersModel.findById(id).select("-password");
       return user;
     } catch (error) {
       throw error;
@@ -37,7 +39,7 @@ export class UserService {
 
   static async getAllUsers() {
     try {
-      const users = await UsersModel.find();
+      const users = await UsersModel.find().select("-password");
       return users;
     } catch (error) {
       throw error;
@@ -52,7 +54,7 @@ export class UserService {
       }
       const updatedUser = await UsersModel.findByIdAndUpdate(id, data, {
         new: true,
-      });
+      }).select("-password");
       return updatedUser;
     } catch (error) {
       throw error;
